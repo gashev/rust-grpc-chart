@@ -1,55 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "rust-grpc-chart.fullname" . }}
+  name: {{ .Values.container.name }}
   labels:
-    {{- include "rust-grpc-chart.labels" . | nindent 4 }}
+    app: {{ .Values.container.name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "rust-grpc-chart.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.container.name }}
   template:
     metadata:
       labels:
-        {{- include "rust-grpc-chart.selectorLabels" . | nindent 8 }}
+        app: {{ .Values.container.name }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-      serviceAccountName: {{ include "rust-grpc-chart.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ .Values.container.name }}
+          image: {{ .Values.container.image }}
+          env:
+          {{- range .Values.container.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+          {{- end }}
           ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+            - containerPort: {{ .Values.container.port }}
+              name: {{ .Values.container.name }}
