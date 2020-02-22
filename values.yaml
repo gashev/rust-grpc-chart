@@ -11,6 +11,20 @@ container:
     - name: DATABASE_URL
       value: postgres://admin:password@db/books
 
+servers:
+  server-example:
+    replicas: 3
+    name: server-example
+    image: docker-local:5000/server
+    port: 50051
+    env:
+      - name: DATABASE_URL
+        value: postgres://admin:password@db/books
+  server-hello-world:
+    replicas: 3
+    name: server-hello-world
+    image: docker-local:5000/server-hello-world
+    port: 50051
 
 image:
   repository: nginx
