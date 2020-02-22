@@ -1,15 +1,14 @@
+{{- range $name, $container := .Values.servers }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "rust-grpc-chart.fullname" . }}
-  labels:
-    {{- include "rust-grpc-chart.labels" . | nindent 4 }}
+  name: {{ $name }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
-    {{- include "rust-grpc-chart.selectorLabels" . | nindent 4 }}
+    app: {{ $name }}
+  ports:
+    - port: {{ $container.port }}
+      targetPort: {{ $container.port }}
+  type: LoadBalancer
+---
+{{- end}}

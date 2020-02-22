@@ -1,27 +1,32 @@
+{{- range $name, $container := .Values.servers }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.container.name }}
+  name: {{ $name }}
   labels:
-    app: {{ .Values.container.name }}
+    app: {{ $name }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ $container.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.container.name }}
+      app: {{ $name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.container.name }}
+        app: {{ $name }}
     spec:
       containers:
-        - name: {{ .Values.container.name }}
-          image: {{ .Values.container.image }}
+        - name: {{ $name }}
+          image: {{ $container.image }}
+          {{- if $container.env }}
           env:
-          {{- range .Values.container.env }}
+          {{- range $container.env }}
             - name: {{ .name }}
               value: {{ .value }}
           {{- end }}
+          {{- end }}
           ports:
-            - containerPort: {{ .Values.container.port }}
-              name: {{ .Values.container.name }}
+            - containerPort: {{ $container.port }}
+              name: {{ $container.name }}
+---
+{{- end}}
