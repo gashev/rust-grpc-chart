@@ -27,6 +27,6 @@ spec:
           {{- end }}
           ports:
             - containerPort: {{ $container.port }}
-              name: {{ $container.name }}
+              name: {{ $name }}
 ---
 {{- end}}
